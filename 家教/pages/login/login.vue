@@ -29,7 +29,7 @@
 				<input type="text" class="input" v-model="PassWord" :password="showPassword"  placeholder="请输入登录密码" >
 				<image class="icon-eye"  @click="Switch()"  :src="showPassword ? closeeye:openeye"  ></image>
 			</view>
-			<button  type="primary" class="button" hover-class="none" @click="login">登录</button>
+			<button  type="primary" class="button" hover-class="none" @click="Login">登录</button>
 		</view>
 		
 		<view class="forget" @click="forget">忘记密码?</view>          
@@ -41,53 +41,54 @@
 		data() {
 			return {
 				UserName:''	,		//账户
-				PassWord:''	,		//密码
+				PassWord:''	,		//密码		
 				showPassword: true,
 				openeye:require('../../static/login/icon-eye2.png'),
 				closeeye:require('../../static/login/icon-eye1.png')
 			}
 		},
 		
-		onShow() {
-		  	uni.getStorage({
-		  		key:'UserInfo',
-				success:(e)=>{
-					this.UserName = e.data.UserName  
-					this.PassWord = e.data.PassWord
-				}
-		  	})
-		},
+		onLoad:function() {
+		    uni.request({
+		     url:'http://rap2api.taobao.org/app/mock/271993/app/login',
+		     method:'GET',
+		     data:{},
+		     success: res => {
+		      this.list=res.data.message;
+		     }
+		    })
+		  },
 		
 		
 		
 		methods: {
 			Switch(){
 				this.showPassword = !this.showPassword
+				console.log(this.list[0])
 			},
 			
-			login(e){
-				console.log(this.PassWord)
-				console.log(this.UserName)
-				var that = this
+			Login(){
+			var that = this
 				if(that.UserName && that.PassWord){
-					if(that.UserName =="admin" && that.PassWord == "123"){
-						/* 验证成功跳转目标页面 */
+					if(that.UserName ==this.list[0].UserName && that.PassWord == this.list[0].PassWord){
+										/* 验证成功跳转目标页面 */
 						uni.reLaunch({
 							url:'../mianpage/mainpage'
-						})
+							})
 					}
 					else{
 						uni.showToast({
 							title: '密码或账户错误'
-						});
-					}
+							});
+						}
 				}
-				else{
+					else{
 						uni.showToast({
 							title: '密码或账户为空'
-						});
-				}
+							});
+						}
 			},
+		
 			
 			regiser(){
 				uni.reLaunch({
